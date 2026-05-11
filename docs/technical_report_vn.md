@@ -36,15 +36,27 @@ Bài toán tìm đường được mô hình hóa thành một đồ thị có t
 
 *Lưu ý: Dữ liệu bản đồ HUST trong dự án này được mô phỏng dựa trên các vị trí tương đối, không phải là dữ liệu trắc địa hoặc tọa độ GPS chính thức từ cơ quan quản lý.*
 
-## 4. Cấu trúc dữ liệu sử dụng
-Project sử dụng các cấu trúc dữ liệu tối ưu cho đồ thị thưa (sparse graph):
-- **Lớp Node:** Lưu trữ thông tin định danh, tên, loại địa điểm, tọa độ x-y và mô tả.
-- **Lớp Edge:** Lưu trữ thông tin đỉnh đầu, đỉnh cuối và trọng số.
-- **Đồ thị (Graph):** Được biểu diễn bằng **Danh sách kề (Adjacency List)**.
-- **Lý do lựa chọn Danh sách kề:**
-    - Bản đồ khuôn viên trường là một đồ thị thưa, mỗi địa điểm thường chỉ kết nối với một vài địa điểm lân cận.
-    - Tiết kiệm bộ nhớ đáng kể so với Ma trận kề (Adjacency Matrix).
-    - Độ phức tạp không gian để lưu trữ đồ thị: $O(V + E)$.
+## 4. Cấu trúc dữ liệu và Thiết kế lớp
+Project được hiện thực hóa bằng ngôn ngữ **Python**, áp dụng thiết kế hướng đối tượng để mô hình hóa bài toán một cách chặt chẽ:
+
+- **Vertex (Đỉnh):** Lưu trữ thông tin định danh, tên, loại địa điểm, tọa độ x-y và mô tả. Thay thế cho khái niệm "Node" trước đây.
+- **Edge (Cạnh):** Lưu trữ thông tin đỉnh nguồn (`source`), đỉnh đích (`destination`), trọng số (`weight`) và nhãn (`label`).
+- **Graph (Đồ thị):** Quản lý danh sách các đỉnh và danh sách kề. Hỗ trợ các phương thức:
+    - `addVertex`, `addEdge`
+    - `getNeighbors`, `getVertex`
+    - `getVertexCount`, `getEdgeCount`
+    - Được biểu diễn bằng **Danh sách kề (Adjacency List)** để tối ưu bộ nhớ.
+- **DijkstraResult:** Lớp bao đóng kết quả trả về từ thuật toán Dijkstra, bao gồm:
+    - `source_id`, `dest_id`
+    - `total_distance`, `path`
+    - `found` (trạng thái tìm thấy), `visited_count`
+    - `elapsed_ms`
+    - Phương thức `print_path()` để hiển thị kết quả một cách chuyên nghiệp.
+- **CampusNavigator:** Lớp điều hướng trung tâm, đóng vai trò là bộ não của ứng dụng, quản lý:
+    - `loadData`, `saveData`
+    - `findShortestPath`
+    - `listLocations`
+    - `performanceTest`
 
 ## 5. Đọc và lưu dữ liệu
 - `data/hust_nodes.csv`: Chứa thông tin về các đỉnh với các cột: `id`, `name`, `type`, `x`, `y`, `description`.

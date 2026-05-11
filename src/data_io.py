@@ -1,5 +1,5 @@
 import csv
-from src.models import Node
+from src.models import Vertex
 from src.graph import Graph
 
 def load_data(nodes_file, edges_file):
@@ -10,15 +10,15 @@ def load_data(nodes_file, edges_file):
         with open(nodes_file, mode='r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                node = Node(
-                    node_id=row['id'],
+                vertex = Vertex(
+                    vertex_id=row['id'],
                     name=row['name'],
-                    node_type=row['type'],
+                    vertex_type=row['type'],
                     x=int(row['x']),
                     y=int(row['y']),
                     description=row['description']
                 )
-                graph.add_node(node)
+                graph.addVertex(vertex)
     except FileNotFoundError:
         print(f"Error: {nodes_file} not found.")
         return None
@@ -28,9 +28,9 @@ def load_data(nodes_file, edges_file):
         with open(edges_file, mode='r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                graph.add_edge(
-                    start_id=row['from'],
-                    end_id=row['to'],
+                graph.addEdge(
+                    source_id=row['from'],
+                    dest_id=row['to'],
                     weight=float(row['weight']),
                     bidirectional=int(row['bidirectional']) == 1
                 )
@@ -40,14 +40,16 @@ def load_data(nodes_file, edges_file):
         
     return graph
 
-def save_data(output_file, result_data):
+def save_data(output_file, result):
     """
     Saves path results to a file for reporting.
     """
     with open(output_file, mode='w', encoding='utf-8') as f:
         f.write(f"Shortest Path Result\n")
         f.write(f"====================\n")
-        f.write(f"Distance: {result_data['distance']}\n")
-        f.write(f"Path: {' -> '.join(result_data['path'])}\n")
-        f.write(f"Visited Nodes: {result_data['visited_count']}\n")
-        f.write(f"Time: {result_data['elapsed_ms']:.4f} ms\n")
+        f.write(f"Source: {result.source_id}\n")
+        f.write(f"Destination: {result.dest_id}\n")
+        f.write(f"Distance: {result.total_distance}\n")
+        f.write(f"Path: {' -> '.join(result.path)}\n")
+        f.write(f"Visited Nodes: {result.visited_count}\n")
+        f.write(f"Time: {result.elapsed_ms:.4f} ms\n")

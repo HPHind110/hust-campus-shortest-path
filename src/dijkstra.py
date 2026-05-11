@@ -1,23 +1,24 @@
 import heapq
 import time
+from src.models import DijkstraResult
 
 def dijkstra(graph, start_id, end_id):
     """
     Implements Dijkstra's algorithm using a min-priority queue (heapq).
     Returns:
-        total_distance, path, visited_count, elapsed_ms
+        DijkstraResult object
     """
     start_time = time.perf_counter()
     
-    # Priority Queue stores: (distance, current_node_id)
+    # Priority Queue stores: (distance, current_vertex_id)
     pq = [(0, start_id)]
     
-    # Distances dictionary: node_id -> shortest distance from start
-    distances = {node_id: float('inf') for node_id in graph.nodes}
+    # Distances dictionary: vertex_id -> shortest distance from start
+    distances = {vertex_id: float('inf') for vertex_id in graph.vertices}
     distances[start_id] = 0
     
-    # Parent dictionary for path reconstruction: node_id -> previous_node_id
-    parents = {node_id: None for node_id in graph.nodes}
+    # Parent dictionary for path reconstruction: vertex_id -> previous_vertex_id
+    parents = {vertex_id: None for vertex_id in graph.vertices}
     
     visited_nodes = set()
     
@@ -35,7 +36,7 @@ def dijkstra(graph, start_id, end_id):
             break
             
         # Explore neighbors
-        for neighbor_id, weight in graph.get_neighbors(current_id):
+        for neighbor_id, weight in graph.getNeighbors(current_id):
             distance = current_distance + weight
             
             # If found a shorter path to neighbor
@@ -52,17 +53,15 @@ def dijkstra(graph, start_id, end_id):
     
     total_distance = distances[end_id]
     visited_count = len(visited_nodes)
-    if total_distance == float('inf'):
-        return float('inf'), [], visited_count, elapsed_ms
-        
-    return total_distance, path, visited_count, elapsed_ms
+    
+    return DijkstraResult(start_id, end_id, total_distance, path, visited_count, elapsed_ms)
 
 def reconstruct_path(parents, start_id, end_id):
     path = []
     current = end_id
     
     # If end_id has no parent and is not start_id, no path exists
-    if parents[end_id] is None and start_id != end_id:
+    if parents.get(end_id) is None and start_id != end_id:
         return []
         
     while current is not None:

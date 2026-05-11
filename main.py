@@ -1,9 +1,6 @@
 import argparse
 import sys
-from src.data_io import load_data
-from src.dijkstra import dijkstra
-from src.performance import run_performance_test, run_benchmark
-from src.visualize import visualize_path
+from src.navigator import CampusNavigator
 
 def main():
     parser = argparse.ArgumentParser(description="HUST Campus Shortest Path Finder")
@@ -20,89 +17,33 @@ def main():
 
     args = parser.parse_args()
 
+    navigator = CampusNavigator()
+
     if args.benchmark:
-        run_performance_test(args.nodes, args.edges, args.seed, args.runs)
+        navigator.performanceTest(args.nodes, args.edges, args.seed, args.runs)
         return
 
     # Load data for other commands
-    graph = load_data("data/hust_nodes.csv", "data/hust_edges.csv")
-    if not graph:
+    if not navigator.loadData("data/hust_nodes.csv", "data/hust_edges.csv"):
         sys.exit(1)
 
     if args.list:
-        print("\n--- HUST Campus Locations ---")
-        
-        # Define the categories and their order
-        categories = {
-            "gate": "Gate",
-            "library": "Library",
-            "lake": "Lake",
-            "building": "Building",
-            "canteen": "Canteen",
-            "dormitory": "Dormitory",
-            "sport": "Sport"
-        }
-        order = ["gate", "library", "lake", "building", "canteen", "dormitory", "sport"]
-        
-        # Group nodes by type
-        grouped = {cat: [] for cat in order}
-        for node in graph.nodes.values():
-            if node.type in grouped:
-                grouped[node.type].append(node)
-        
-        for cat_key in order:
-            nodes_in_cat = grouped[cat_key]
-            if not nodes_in_cat:
-                continue
-                
-            print(f"\n[{categories[cat_key]}]")
-            
-            # Find max length of ID for alignment (only for those with different names)
-            max_id_len = 0
-            for node in nodes_in_cat:
-                display_name = "Ta Quang Buu Library" if node.id == "TQB_LIBRARY" else node.name
-                if node.id != display_name:
-                    max_id_len = max(max_id_len, len(node.id))
-            
-            for node in nodes_in_cat:
-                display_name = "Ta Quang Buu Library" if node.id == "TQB_LIBRARY" else node.name
-                if node.id == display_name:
-                    print(f"  - {node.id}")
-                else:
-                    print(f"  - {node.id:<{max_id_len}} : {display_name}")
+        navigator.listLocations()
         return
 
     if args.start and args.end:
-        # Resolve IDs if names were provided
-        start_node = graph.nodes.get(args.start) or graph.get_node_by_name(args.start)
-        end_node = graph.nodes.get(args.end) or graph.get_node_by_name(args.end)
-
-        if not start_node:
-            print(f"Error: Start location '{args.start}' not found.")
-            return
-        if not end_node:
-            print(f"Error: End location '{args.end}' not found.")
-            return
-
-        print(f"\nFinding path from {start_node.name} to {end_node.name}...")
-        dist, path, visited, time_ms = dijkstra(graph, start_node.id, end_node.id)
-
-        if dist == float('inf'):
-            print("No path found between these locations.")
-        else:
-            print(f"\nResults:")
-            print(f"- Total Distance: {dist} meters")
-            print(f"- Path: {' -> '.join(path)}")
-            print(f"- Visited Nodes: {visited}")
-            print(f"- Execution Time: {time_ms:.4f} ms")
-            
+        result = navigator.findShortestPath(args.start, args.end)
+        if result:
+            result.print_path()
             if args.visualize:
-                visualize_path(graph, path)
+                navigator.visualize(result)
+        else:
+            print(f"Error: One or both locations ('{args.start}', '{args.end}') not found.")
         return
 
     if args.test:
         print("Running performance test on HUST map...")
-        run_benchmark(graph)
+        navigator.runHustBenchmark()
         return
 
     parser.print_help()
