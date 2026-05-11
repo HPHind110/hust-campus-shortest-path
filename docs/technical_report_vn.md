@@ -206,7 +206,7 @@ Thuật toán Dijkstra được sử dụng để tìm đường đi ngắn nh�
 - `priority queue`: Hàng đợi ưu tiên dùng để lấy ra đỉnh có khoảng cách tạm thời nhỏ nhất.
 - `visited`: Tập các đỉnh đã được xử lý chắc chắn.
 
-### 6.2. Bước thư giãn cạnh
+### 6.2. Bước nới lỏng cạnh (Relaxation)
 
 Với mỗi cạnh từ `u` đến `v` có trọng số `w`, nếu:
 
