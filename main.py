@@ -29,10 +29,45 @@ def main():
 
     if args.list:
         print("\n--- HUST Campus Locations ---")
-        print(f"{'ID':<15} | {'Name':<20} | {'Type':<10}")
-        print("-" * 50)
+        
+        # Define the categories and their order
+        categories = {
+            "gate": "Gate",
+            "library": "Library",
+            "lake": "Lake",
+            "building": "Building",
+            "canteen": "Canteen",
+            "dormitory": "Dormitory",
+            "sport": "Sport"
+        }
+        order = ["gate", "library", "lake", "building", "canteen", "dormitory", "sport"]
+        
+        # Group nodes by type
+        grouped = {cat: [] for cat in order}
         for node in graph.nodes.values():
-            print(f"{node.id:<15} | {node.name:<20} | {node.type:<10}")
+            if node.type in grouped:
+                grouped[node.type].append(node)
+        
+        for cat_key in order:
+            nodes_in_cat = grouped[cat_key]
+            if not nodes_in_cat:
+                continue
+                
+            print(f"\n[{categories[cat_key]}]")
+            
+            # Find max length of ID for alignment (only for those with different names)
+            max_id_len = 0
+            for node in nodes_in_cat:
+                display_name = "Ta Quang Buu Library" if node.id == "TQB_LIBRARY" else node.name
+                if node.id != display_name:
+                    max_id_len = max(max_id_len, len(node.id))
+            
+            for node in nodes_in_cat:
+                display_name = "Ta Quang Buu Library" if node.id == "TQB_LIBRARY" else node.name
+                if node.id == display_name:
+                    print(f"  - {node.id}")
+                else:
+                    print(f"  - {node.id:<{max_id_len}} : {display_name}")
         return
 
     if args.start and args.end:

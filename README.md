@@ -24,12 +24,12 @@ python main.py --list
 
 ### 2. Find shortest path by ID
 ```bash
-python main.py --start NORTH_GATE --end E_LIBRARY
+python main.py --start NORTH_GATE --end TQB_LIBRARY
 ```
 
 ### 3. Find shortest path by Name
 ```bash
-python main.py --start "North Gate" --end "E-Library"
+python main.py --start "North Gate" --end "Thư viện Tạ Quang Bửu"
 ```
 
 ### 4. Run performance benchmark
