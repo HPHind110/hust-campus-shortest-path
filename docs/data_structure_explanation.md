@@ -5,7 +5,7 @@ This document explains the choices of data structures used in the HUST Shortest 
 ## 1. Graph: Adjacency List
 We represent the HUST campus map using an **Adjacency List**.
 - **Structure**: A dictionary mapping `node_id` to a list of tuples `(neighbor_id, weight)`.
-- **Reasoning**: Campus maps are generally sparse (each building only connects to a few neighbors). An Adjacency List is more memory-efficient \($O(V+E)$\) than an Adjacency Matrix \($O(V^2)$\).
+- **Reasoning**: Campus maps are generally sparse (each building only connects to a few neighbors). An Adjacency List is more memory-efficient (\$O(V+E)$)\ than an Adjacency Matrix \($O(V^2)$\).
 
 ## 2. Priority Queue: Min-Heap
 For Dijkstra's algorithm, we need to efficiently extract the node with the minimum tentative distance.
