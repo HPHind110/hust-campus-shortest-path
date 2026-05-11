@@ -1,35 +1,31 @@
-# Complexity Analysis
+# Phân tích Độ phức tạp (Complexity Analysis)
 
-Analysis of the Dijkstra implementation for the HUST Campus Shortest Path project.
+Phân tích hiệu năng của thuật toán Dijkstra được hiện thực hóa trong dự án tìm đường HUST.
 
-## 1. Time Complexity
+## 1. Độ phức tạp thời gian (Time Complexity)
 
-The implementation uses an **Adjacency List** and a **Min-Priority Queue (Binary Heap)**.
+Hiện thực sử dụng **Danh sách kề (Adjacency List)** và **Hàng đợi ưu tiên (Min-Heap)** thông qua thư viện `heapq` trong Python.
 
-- **Initialization**: $O(V)$ to set initial distances to infinity.
-- **Main Loop**: Executes at most $V$ times (once per node).
-- **Edge Relaxation**: Total number of relaxations is $E$.
-- **Heap Operations**:
-    - `heappop`: $O(\log V)$
-    - `heappush`: $O(\log V)$
+- **Khởi tạo**: $O(V)$ để thiết lập các khoảng cách ban đầu.
+- **Vòng lặp chính**: Thực hiện tối đa $V$ lần.
+- **Thao tác Heap**: Mỗi đỉnh được thêm và lấy ra khỏi heap một lần, mỗi cạnh có thể kích hoạt một thao tác `heappush`.
+- **Tổng quát**: **$O((V + E) \log V)$**
 
-Total Time Complexity: **$O((V + E) \log V)$**
+Trong đó $V$ là số đỉnh và $E$ là số cạnh. Với dữ liệu bản đồ HUST mô phỏng (đồ thị thưa), hiệu năng này là tối ưu.
 
-In a dense graph, this is significantly better than the $O(V^2)$ approach using a simple array. Empirical validation of this complexity can be found in the [Performance Test Report](performance_test.md).
+## 2. Độ phức tạp không gian (Space Complexity)
 
-## 2. Space Complexity
+- **Danh sách kề**: $O(V + E)$
+- **Bản đồ khoảng cách/đỉnh cha**: $O(V)$
+- **Hàng đợi ưu tiên**: $O(V)$
+- **Tổng quát**: **$O(V + E)$**
 
-- **Adjacency List**: $O(V + E)$ to store nodes and edges.
-- **Distances Map**: $O(V)$
-- **Parents Map**: $O(V)$
-- **Priority Queue**: $O(V)$ in the worst case.
+## 3. Lựa chọn Cấu trúc dữ liệu (Python)
 
-Total Space Complexity: **$O(V + E)$**
-
-## 3. Data Structure Choices
-
-| Component | Choice | Reason |
+| Thành phần | Lựa chọn | Lý do |
 | :--- | :--- | :--- |
-| Graph | Adjacency List | Memory efficient for sparse campus maps. |
-| Priority Queue | `heapq` (Min-Heap) | Provides efficient $O(\log V)$ extraction of the minimum distance node. |
-| Path Tracking | Dictionary (Parent Map) | $O(1)$ lookup and easy path reconstruction. |
+| Đồ thị | `dict` (Adjacency List) | Tiết kiệm bộ nhớ cho đồ thị thưa, truy cập lân cận $O(1)$. |
+| Priority Queue | `heapq` | Cung cấp các thao tác $O(\log V)$ cho việc lấy đỉnh có khoảng cách nhỏ nhất. |
+| Kết quả | `DijkstraResult` class | Bao đóng dữ liệu giúp quản lý và hiển thị thông tin rõ ràng. |
+
+Kiểm chứng thực tế về độ phức tạp này có thể xem tại [Báo cáo Hiệu năng](performance_test.md).
