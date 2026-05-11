@@ -33,8 +33,14 @@ python main.py --start "North Gate" --end "Thư viện Tạ Quang Bửu"
 ```
 
 ### 4. Run performance benchmark
+On actual HUST map:
 ```bash
 python main.py --test
+```
+
+On generated random graphs:
+```bash
+python main.py --benchmark --nodes 1000 --edges 4000
 ```
 
 ## Documentation
@@ -42,4 +48,4 @@ Detailed documentation is available in the `docs/` folder:
 - [Pseudocode](docs/pseudocode.md)
 - [Complexity Analysis](docs/complexity.md)
 - [Data Structures](docs/data_structure_explanation.md)
-- [Performance Test Results](docs/performance_test.md)
+- [Performance Test Results](docs/performance_test.md) (Updated with actual benchmark data)

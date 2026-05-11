@@ -19,19 +19,20 @@ def dijkstra(graph, start_id, end_id):
     # Parent dictionary for path reconstruction: node_id -> previous_node_id
     parents = {node_id: None for node_id in graph.nodes}
     
-    visited_count = 0
+    visited_nodes = set()
     
     while pq:
         current_distance, current_id = heapq.heappop(pq)
-        visited_count += 1
+        
+        # Standard Dijkstra: if we found a longer path, skip it
+        if current_distance > distances[current_id]:
+            continue
+
+        visited_nodes.add(current_id)
         
         # If we reached the target, we can stop early
         if current_id == end_id:
             break
-            
-        # Standard Dijkstra: if we found a longer path, skip it
-        if current_distance > distances[current_id]:
-            continue
             
         # Explore neighbors
         for neighbor_id, weight in graph.get_neighbors(current_id):
@@ -50,6 +51,7 @@ def dijkstra(graph, start_id, end_id):
     path = reconstruct_path(parents, start_id, end_id)
     
     total_distance = distances[end_id]
+    visited_count = len(visited_nodes)
     if total_distance == float('inf'):
         return float('inf'), [], visited_count, elapsed_ms
         

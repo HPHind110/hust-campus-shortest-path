@@ -15,11 +15,13 @@ def main():
     parser.add_argument("--benchmark", action="store_true", help="Run benchmark on a generated random graph")
     parser.add_argument("--nodes", type=int, default=1000, help="Number of nodes for benchmark")
     parser.add_argument("--edges", type=int, default=3000, help="Number of extra edges for benchmark")
+    parser.add_argument("--seed", type=int, default=42, help="Seed for random graph generation")
+    parser.add_argument("--runs", type=int, default=5, help="Number of benchmark runs")
 
     args = parser.parse_args()
 
     if args.benchmark:
-        run_performance_test(args.nodes, args.edges)
+        run_performance_test(args.nodes, args.edges, args.seed, args.runs)
         return
 
     # Load data for other commands

@@ -1,0 +1,20 @@
+Generating random graph with 10000 nodes, 40000 extra edges (Seed: 42)...
+Running benchmark with 5 runs from 0 to 9999...
+
+--- Benchmark Results ---
+Number of nodes:      10000
+Total edges:          49999
+Extra edges (req):    40000
+Extra edges (added):  40000
+Seed:                 42
+Runs:                 5
+--------------------------
+Shortest distance:    126
+Path length:          10
+Visited node count:   7747
+--------------------------
+Avg runtime:          37.5876 ms
+Median runtime:       37.7514 ms
+Min runtime:          34.7941 ms
+Max runtime:          40.6592 ms
+--------------------------

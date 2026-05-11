@@ -15,7 +15,7 @@ The implementation uses an **Adjacency List** and a **Min-Priority Queue (Binary
 
 Total Time Complexity: **$O((V + E) \log V)$**
 
-In a dense graph, this is significantly better than the $O(V^2)$ approach using a simple array.
+In a dense graph, this is significantly better than the $O(V^2)$ approach using a simple array. Empirical validation of this complexity can be found in the [Performance Test Report](performance_test.md).
 
 ## 2. Space Complexity
 
