@@ -1,0 +1,29 @@
+id,name,type,x,y,description
+NORTH_GATE,North Gate,gate,360,90,Cổng Bắc trên đường Đại Cồ Việt
+WEST_GATE,West Gate,gate,80,320,Cổng Tây phía Giải Phóng
+EAST_GATE,East Gate,gate,920,560,Cổng Đông gần sân vận động
+C1,C1,building,360,140,Nhà C1 khu trung tâm
+C2,C2,building,250,220,Nhà C2
+C3,C3,building,470,180,Nhà C3
+C4,C4,building,470,230,Nhà C4
+C5,C5,building,470,280,Nhà C5
+C6,C6,building,560,240,Nhà C6
+C7,C7,building,560,290,Nhà C7
+C8,C8,building,570,340,Nhà C8
+C9,C9,building,260,270,Nhà C9
+C10,C10,building,470,330,Nhà C10
+TIEN_LAKE,Tien Lake,lake,350,450,Hồ Tiền
+E_LIBRARY,E-Library,library,450,430,Thư viện điện tử
+D3,D3,building,540,390,Nhà D3
+D5,D5,building,540,450,Nhà D5
+D6,D6,building,260,450,Nhà D6
+D8,D8,building,260,500,Nhà D8
+D9,D9,building,450,520,Nhà D9
+B8_GATE,B8 Gate,gate,650,340,Cổng/điểm nối khu B8
+B8,B8,building,670,390,Nhà B8
+B7,B7,building,670,300,Nhà B7
+B6,B6,building,670,220,Nhà B6
+B1,B1,building,740,420,Nhà B1
+CANTEEN,Canteen,canteen,750,520,Khu căng tin/mô phỏng
+DORMITORY,Dormitory,dormitory,880,480,Ký túc xá/mô phỏng
+STADIUM,Stadium,sport,760,600,Sân vận động
