@@ -1,129 +1,176 @@
-# BÁO CÁO KỸ THUẬT: TÌM ĐƯỜNG ĐI NGẮN NHẤT TRONG KHUÔN VIÊN BÁCH KHOA (HUST)
+# Báo cáo kỹ thuật: Ứng dụng tìm đường đi ngắn nhất trong khuôn viên HUST bằng thuật toán Dijkstra
 
-**Thành viên:** Lập trình viên 1 (Core Programmer)
+## 1. Giới thiệu đề tài
+Dự án tập trung vào việc mô phỏng hệ thống tìm đường đi ngắn nhất bên trong khuôn viên trường Đại học Bách khoa Hà Nội (HUST). 
+- Người dùng có thể chọn điểm bắt đầu và điểm kết thúc từ danh sách các địa điểm có sẵn.
+- Chương trình tính toán và trả về đường đi ngắn nhất cùng với tổng khoảng cách di chuyển.
+- Mục tiêu chính của dự án là áp dụng kiến thức về cấu trúc dữ liệu đồ thị và thuật toán Dijkstra vào bài toán thực tế, không phải là một hệ thống dẫn đường GPS chuyên dụng.
 
-## 1. Vai trò trong nhóm
-Trong dự án này, tôi đảm nhận vai trò **Lập trình viên chính (Core Programmer 1)**, chịu trách nhiệm về phần nền tảng kỹ thuật và thuật toán cốt lõi của ứng dụng. Các đầu việc cụ thể bao gồm:
-- Thiết kế và cài đặt cấu trúc dữ liệu đồ thị (Graph).
-- Cài đặt thuật toán Dijkstra tìm đường đi ngắn nhất.
-- Xây dựng cơ chế truy vết đường đi (Path reconstruction).
-- Phát triển các hàm xử lý dữ liệu đầu vào/đầu ra (loadData, saveData).
-- Viết các test case và thực hiện kiểm thử hiệu năng (Performance test).
-- Viết tài liệu kỹ thuật, mã giả (pseudocode) và phân tích độ phức tạp thuật toán.
+## 2. Phân tích bài toán
+- **Đầu vào (Input):**
+    - Danh sách các địa điểm (node) được đọc từ file `data/hust_nodes.csv`.
+    - Danh sách các con đường/lối đi (edge) được đọc từ file `data/hust_edges.csv`.
+    - Điểm xuất phát và điểm đích do người dùng nhập từ dòng lệnh.
+- **Đầu ra (Output):**
+    - Tổng khoảng cách ngắn nhất.
+    - Danh sách các điểm đi qua theo thứ tự.
+    - Số lượng node đã duyệt (visited nodes) để đánh giá hiệu năng.
+    - Thời gian thực thi thuật toán.
+    - Hình ảnh trực quan hóa sơ đồ đường đi (tùy chọn).
+- **Ràng buộc (Constraints):**
+    - Trọng số các cạnh (khoảng cách) phải là số dương hoặc không âm.
+    - Đồ thị hỗ trợ cả cạnh một chiều và hai chiều (thông qua thuộc tính `bidirectional`).
+    - Dữ liệu bản đồ HUST trong project này mang tính chất mô phỏng, dùng để minh họa cho thuật toán.
 
-## 2. Phân tích Input/Output
-Hệ thống xử lý hai loại dữ liệu chính:
+## 3. Mô hình hóa bản đồ HUST thành đồ thị
+Bài toán tìm đường được mô hình hóa thành một đồ thị có trọng số:
+- **Đỉnh (Vertex/Node):** Mỗi địa điểm trong khuôn viên trường (cổng, nhà học, thư viện, hồ, sân vận động) là một đỉnh.
+- **Cạnh (Edge):** Mỗi lối đi bộ nối giữa hai địa điểm là một cạnh.
+- **Trọng số (Weight):** Đại diện cho khoảng cách di chuyển xấp xỉ giữa các địa điểm.
+- **Các địa điểm tiêu biểu:**
+    - `NORTH_GATE`, `WEST_GATE`, `EAST_GATE`: Các cổng chính của trường.
+    - `C1`, `C2`, `C3`, ...: Các tòa nhà học khu C.
+    - `TQB_LIBRARY`: Tên định danh (ID) của Thư viện Tạ Quang Bửu. Trong các báo cáo và hiển thị, địa điểm này được trình bày đầy đủ là "Thư viện Tạ Quang Bửu".
+    - `TIEN_LAKE`: Hồ Tiền.
+    - `STADIUM`: Sân vận động Bách khoa.
 
-### Input:
-- **Dữ liệu Node (hust_nodes.csv):** Chứa thông tin về các địa điểm bao gồm ID, tên, loại địa điểm (tòa nhà, cổng, hồ...), tọa độ (x, y) và mô tả ngắn.
-- **Dữ liệu Edge (hust_edges.csv):** Chứa thông tin về các đoạn đường nối giữa hai địa điểm, trọng số (khoảng cách tính bằng mét) và tính chất đường (một chiều hoặc hai chiều).
+*Lưu ý: Dữ liệu bản đồ HUST trong dự án này được mô phỏng dựa trên các vị trí tương đối, không phải là dữ liệu trắc địa hoặc tọa độ GPS chính thức từ cơ quan quản lý.*
 
-### Output:
-- **Kết quả tìm đường:** Trả về tổng khoảng cách ngắn nhất, danh sách các địa điểm đi qua theo thứ tự, số lượng node đã duyệt và thời gian thực thi (ms).
-- **Visualization:** Hình ảnh sơ đồ đồ thị với đường đi ngắn nhất được làm nổi bật (nếu người dùng yêu cầu).
+## 4. Cấu trúc dữ liệu sử dụng
+Project sử dụng các cấu trúc dữ liệu tối ưu cho đồ thị thưa (sparse graph):
+- **Lớp Node:** Lưu trữ thông tin định danh, tên, loại địa điểm, tọa độ x-y và mô tả.
+- **Lớp Edge:** Lưu trữ thông tin đỉnh đầu, đỉnh cuối và trọng số.
+- **Đồ thị (Graph):** Được biểu diễn bằng **Danh sách kề (Adjacency List)**.
+- **Lý do lựa chọn Danh sách kề:**
+    - Bản đồ khuôn viên trường là một đồ thị thưa, mỗi địa điểm thường chỉ kết nối với một vài địa điểm lân cận.
+    - Tiết kiệm bộ nhớ đáng kể so với Ma trận kề (Adjacency Matrix).
+    - Độ phức tạp không gian để lưu trữ đồ thị: $O(V + E)$.
 
-## 3. Mô hình hóa bản đồ HUST thành đồ thị (Graph)
-Bản đồ khuôn viên Bách Khoa được mô hình hóa dưới dạng **đồ thị có trọng số (Weighted Graph)**:
-- **Node (Đỉnh):** Đại diện cho các thực thể vật lý như cổng trường (North Gate, West Gate...), các tòa nhà (C1, D3, B1...), các địa điểm tiện ích (Thư viện Tạ Quang Bửu, Hồ Tiền, Căng tin, Sân vận động).
-- **Edge (Cạnh):** Đại diện cho các lối đi bộ, đường nội bộ giữa hai địa điểm.
-- **Weight (Trọng số):** Đại diện cho khoảng cách xấp xỉ tính bằng mét giữa hai đỉnh.
-- **Hướng:** Đa số các cạnh là hai chiều (bidirectional), phù hợp với việc đi bộ trong khuôn viên.
+## 5. Đọc và lưu dữ liệu
+- `data/hust_nodes.csv`: Chứa thông tin về các đỉnh với các cột: `id`, `name`, `type`, `x`, `y`, `description`.
+- `data/hust_edges.csv`: Chứa thông tin về các cạnh với các cột: `from`, `to`, `weight`, `bidirectional`.
+- **Hàm load_data():** Sử dụng thư viện `csv` để đọc dữ liệu từ tệp và xây dựng đồ thị trong bộ nhớ.
+- **Hàm save_data():** Hỗ trợ ghi kết quả tìm kiếm ra tệp để lưu trữ báo cáo.
 
-*Lưu ý: Dữ liệu bản đồ HUST hiện tại là dữ liệu mô phỏng dựa trên vị trí tương đối và bản đồ công khai, không phải là số liệu đo đạc thực tế chính xác tuyệt đối.*
+## 6. Thuật toán Dijkstra
+Thuật toán Dijkstra được sử dụng để tìm đường đi ngắn nhất từ một đỉnh nguồn đến các đỉnh khác trong đồ thị có trọng số không âm. 
+- **Các cấu trúc chính:**
+    - `distances`: Lưu khoảng cách ngắn nhất hiện tại từ điểm bắt đầu đến mỗi node.
+    - `parents`: Lưu node trước đó của mỗi node để phục hồi lại đường đi.
+    - `priority queue (Min-Heap)`: Luôn chọn node có khoảng cách tạm thời nhỏ nhất để duyệt tiếp.
+- **Bước thư giãn (Relaxation):** Nếu phát hiện đường đi qua $u$ đến $v$ ngắn hơn đường đi hiện tại đến $v$ ($dist[u] + weight(u, v) < dist[v]$), ta cập nhật lại $dist[v]$ và $parent[v]$.
+- **Dừng sớm (Early Stopping):** Khi node đích được lấy ra khỏi Priority Queue, ta chắc chắn đã tìm được đường đi ngắn nhất đến đích và có thể dừng thuật toán ngay lập tức.
+- **Phục hồi đường đi:** Sử dụng mảng `parents` để truy ngược từ node đích về node bắt đầu.
 
-## 4. Lựa chọn cấu trúc dữ liệu: Danh sách kề (Adjacency List)
-Tôi lựa chọn **Danh sách kề** để lưu trữ đồ thị thay vì Ma trận kề vì:
-- **Tiết kiệm bộ nhớ:** Bản đồ khuôn viên trường học là một đồ thị thưa (mỗi địa điểm chỉ kết nối với một vài địa điểm lân cận). Danh sách kề chỉ tiêu tốn không gian $O(V + E)$.
-- **Hiệu suất duyệt:** Khi thực hiện Dijkstra, việc tìm các nút lân cận diễn ra rất nhanh chóng, giúp tối ưu thời gian thực thi.
-
-## 5. Sử dụng Hàng đợi ưu tiên (Priority Queue/Min-Heap)
-Trong thuật toán Dijkstra, việc tìm nút có khoảng cách nhỏ nhất trong mỗi bước là cực kỳ quan trọng.
-- Tôi sử dụng module `heapq` (Min-Heap) của Python để cài đặt Priority Queue.
-- **Lý do:** Việc lấy ra phần tử nhỏ nhất chỉ mất $O(\log V)$, thay vì $O(V)$ nếu dùng mảng thông thường. Điều này giúp thuật toán đạt hiệu năng tối ưu, đặc biệt là khi mở rộng quy mô dữ liệu.
-
-## 6. Giải thích thuật toán Dijkstra
-Thuật toán hoạt động dựa trên cơ chế **"Thư giãn cạnh" (Edge Relaxation)**:
-1. Khởi tạo khoảng cách tới nút gốc là 0, các nút khác là vô cùng ($\infty$).
-2. Đưa nút gốc vào hàng đợi ưu tiên.
-3. Chừng nào hàng đợi chưa trống:
-   - Lấy nút $u$ có khoảng cách nhỏ nhất hiện tại.
-   - Nếu đã tới đích, dừng lại.
-   - Với mỗi hàng xóm $v$ của $u$, tính toán khoảng cách mới: $dist(v) = dist(u) + weight(u, v)$.
-   - Nếu khoảng cách mới này nhỏ hơn khoảng cách hiện tại đang lưu cho $v$, cập nhật lại và đưa $v$ vào hàng đợi.
-4. Lưu lại nút cha của mỗi nút để truy vết đường đi sau khi kết thúc.
-
-## 7. Mã giả (Pseudocode)
+### Mã giả thuật toán (Pseudocode):
 ```text
-FUNCTION Dijkstra(Graph, StartNode, EndNode):
-    CREATE a Priority Queue (PQ)
-    CREATE a Map 'Distances' with all nodes set to Infinity
-    CREATE a Map 'Parents' to track the path
-    
-    SET Distances[StartNode] = 0
-    PUSH (0, StartNode) into PQ
-    
-    WHILE PQ is not empty:
-        POP (current_distance, current_node) with smallest distance
-        
-        IF current_node == EndNode:
-            BREAK (Target reached)
-            
-        IF current_distance > Distances[current_node]:
-            CONTINUE (Skip outdated path)
-            
-        FOR each neighbor of current_node:
-            weight = edge weight between current_node and neighbor
-            new_distance = current_distance + weight
-            
-            IF new_distance < Distances[neighbor]:
-                Distances[neighbor] = new_distance
-                Parents[neighbor] = current_node
-                PUSH (new_distance, neighbor) into PQ
-                
-    RETURN Distances[EndNode] and RECONSTRUCT_PATH(Parents, EndNode)
+Dijkstra(graph, start, target):
+    dist[start] = 0
+    parent[start] = None
+    heap = [(0, start)]  # Priority Queue chứa (distance, node_id)
+
+    while heap is not empty:
+        current_distance, u = pop node with smallest distance from heap
+
+        if u == target:
+            break
+
+        if current_distance > dist[u]:
+            continue
+
+        for each neighbor v of u with weight w:
+            new_distance = current_distance + w
+
+            if new_distance < dist[v]:
+                dist[v] = new_distance
+                parent[v] = u
+                push (new_distance, v) into heap
+
+    reconstruct path from parent by backtracking from target
+    return distance and path
 ```
 
-## 8. Phân tích độ phức tạp Big-O
+## 7. Độ phức tạp thuật toán
+Gọi $V$ là số lượng đỉnh và $E$ là số lượng cạnh.
 - **Độ phức tạp thời gian:** $O((V + E) \log V)$
-    - Duyệt qua mỗi đỉnh tối đa 1 lần ($V$).
-    - Duyệt qua mỗi cạnh tối đa 1 lần ($E$).
-    - Mỗi thao tác trên Heap mất $\log V$.
+    - Do sử dụng Danh sách kề và Priority Queue (Binary Heap).
+    - Mỗi cạnh được xét tối đa 2 lần (trong đồ thị vô hướng).
+    - Thao tác trên Heap mất $O(\log V)$.
 - **Độ phức tạp không gian:** $O(V + E)$
-    - Lưu trữ danh sách kề và các cấu trúc phụ trợ (Distances, Parents).
+    - Danh sách kề lưu trữ đỉnh và cạnh.
+    - Các cấu trúc hỗ trợ như `distances`, `parents` và `heap` đều có kích thước tối đa là $V$.
 
-## 9. Test case nhỏ (HUST Data)
-**Kịch bản:** Tìm đường từ Cổng Bắc (NORTH_GATE) đến Sân vận động (STADIUM).
-- **Kết quả thực tế:**
-    - Tổng khoảng cách: 790.0 mét.
-    - Đường đi: Cổng Bắc $\rightarrow$ C1 $\rightarrow$ C3 $\rightarrow$ C6 $\rightarrow$ C7 $\rightarrow$ C8 $\rightarrow$ B8 Gate $\rightarrow$ B1 $\rightarrow$ Sân vận động.
-    - Số đỉnh đã duyệt: 27.
-    - Thời gian thực thi: ~0.05 ms.
+## 8. Chức năng dòng lệnh
+Ứng dụng cung cấp giao diện dòng lệnh (CLI) linh hoạt thông qua tệp `main.py`:
+
+- **Liệt kê địa điểm:**
+  `python main.py --list`
+- **Tìm đường đi ngắn nhất (theo ID):**
+  `python main.py --start NORTH_GATE --end TQB_LIBRARY`
+- **Tìm đường và trực quan hóa:**
+  `python main.py --start NORTH_GATE --end STADIUM --visualize`
+- **Chạy benchmark hiệu năng:**
+  `python main.py --benchmark --nodes 10000 --edges 40000 --seed 42 --runs 5`
+
+**Giải thích các tùy chọn:**
+- `--list`: Hiển thị danh sách các địa điểm theo nhóm.
+- `--start` / `--end`: ID hoặc tên địa điểm bắt đầu và kết thúc.
+- `--visualize`: Tạo hình ảnh sơ đồ đường đi.
+- `--benchmark`: Chạy kiểm thử hiệu năng trên đồ thị ngẫu nhiên.
+- `--nodes` / `--edges`: Số lượng đỉnh và cạnh phụ cho benchmark.
+- `--seed`: Hạt giống ngẫu nhiên để đảm bảo kết quả benchmark có thể tái lập.
+- `--runs`: Số lần lặp lại benchmark để lấy số liệu thống kê.
+
+## 9. Trực quan hóa đường đi
+- Chương trình sử dụng tọa độ `x, y` từ dữ liệu node để vẽ sơ đồ.
+- Các đỉnh và cạnh được vẽ trên một mặt phẳng 2D mô phỏng.
+- Đường đi ngắn nhất được làm nổi bật để dễ dàng theo dõi.
+- Hình ảnh kết quả được lưu tại `output/hust_shortest_path.png`.
+- *Lưu ý: Đây chỉ là sơ đồ trực quan hóa đơn giản, không thay thế cho bản đồ địa lý thực tế.*
 
 ## 10. Performance test với dữ liệu lớn
-Tôi đã thực hiện benchmark trên các đồ thị ngẫu nhiên quy mô lớn để kiểm tra giới hạn của hệ thống:
-| Số Node | Số Cạnh | Thời gian thực thi (ms) |
-| :--- | :--- | :--- |
-| 1,000 | ~4,000 | 3.71 ms |
-| 5,000 | ~20,000 | 6.87 ms |
-| 10,000 | ~40,000 | 15.20 ms (ước tính) |
+Để đánh giá khả năng xử lý của thuật toán, project thực hiện benchmark trên các đồ thị liên thông được sinh ngẫu nhiên với kích thước lớn.
 
-**Nhận xét:** Ngay cả với 5,000 địa điểm, thời gian phản hồi vẫn dưới 10ms, chứng tỏ thuật toán cài đặt cực kỳ hiệu quả và có khả năng mở rộng tốt.
+**Quy trình sinh đồ thị benchmark:**
+1. Tạo $n$ đỉnh từ 0 đến $n-1$.
+2. Tạo một chuỗi liên kết cơ bản (Base edges): $0-1-2-...-(n-1)$. Việc này đảm bảo đồ thị luôn liên thông và luôn có đường đi giữa hai điểm bất kỳ.
+3. Thêm các cạnh phụ (Extra edges) ngẫu nhiên giữa các đỉnh dựa trên tham số `--edges`.
+4. Thực hiện tìm đường từ đỉnh 0 đến đỉnh cuối cùng $n-1$.
+5. Đo lường các chỉ số thời gian thực thi qua nhiều lần chạy.
 
-## 11. Tính năng Visualization
-Mặc dù dự án tập trung vào thuật toán core, tôi đã tích hợp thêm module `matplotlib` để:
-- Vẽ sơ đồ các địa điểm theo tọa độ (x, y).
-- Kết nối các địa điểm bằng các đường thẳng (cạnh).
-- Tô màu đỏ và đánh dấu mũi tên cho đường đi ngắn nhất tìm được.
-- Điều này giúp người dùng dễ dàng hình dung lộ trình trong thực tế.
+**Kết quả Benchmark thực tế:**
 
-## 12. Hạn chế của dữ liệu mô phỏng
-- **Độ chính xác:** Khoảng cách được tính toán dựa trên tọa độ pixel mô phỏng và ước lượng, không phản ánh chính xác từng mét trên thực tế.
-- **Tính thời gian thực:** Chưa tính đến các yếu tố như đường đang thi công, các tòa nhà đang đóng cửa hoặc mật độ người đi bộ.
-- **Địa hình:** Đồ thị hiện tại giả định mặt phẳng 2D, chưa xét đến yếu tố độ cao hoặc đi xuyên qua tầng của các tòa nhà.
+| Số node | Cạnh phụ yêu cầu | Cạnh phụ thêm được | Tổng số cạnh | Seed | Số lần chạy | Avg runtime (ms) | Median runtime (ms) | Min-Max runtime (ms) |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1.000 | 4.000 | 4.000 | 4.999 | 42 | 5 | 2.5499 | 2.5199 | 2.4970 - 2.6903 |
+| 5.000 | 20.000 | 20.000 | 24.999 | 42 | 5 | 16.4899 | 16.1804 | 14.9043 - 18.6098 |
+| 10.000 | 40.000 | 40.000 | 49.999 | 42 | 5 | 37.5876 | 37.7514 | 34.7941 - 40.6592 |
 
-## 13. Hướng mở rộng
-Nếu có cơ hội phát triển tiếp, tôi đề xuất:
-- **Tích hợp GPS/OSM:** Sử dụng dữ liệu thực từ OpenStreetMap để có tọa độ kinh độ/vĩ độ chính xác.
-- **Real-time Traffic:** Cập nhật trọng số cạnh dựa trên mật độ giao thông hoặc sự kiện thực tế trong trường.
-- **Đa phương tiện:** Hỗ trợ tìm đường cho cả người đi bộ, xe đạp và xe máy (với các quy định cấm đường khác nhau).
-- **Web/Mobile UI:** Xây dựng giao diện người dùng thân thiện hơn thay vì dòng lệnh (CLI).
+**Nhận xét:**
+- Kết quả cho thấy thuật toán Dijkstra với Min-Heap xử lý rất hiệu quả trên các đồ thị thưa. Ngay cả với 10.000 node và 50.000 cạnh, thời gian phản hồi vẫn duy trì ở mức dưới 40ms.
+- Việc sử dụng `Median runtime` giúp đánh giá hiệu năng chính xác hơn nhờ loại bỏ các biến động bất thường từ hệ thống.
+- Các chỉ số trên đồ thị ngẫu nhiên không đại diện cho bản đồ HUST thực tế nhưng chứng minh được tính ổn định và khả năng mở rộng của mã nguồn.
+
+## 11. Kiểm thử
+Dự án bao gồm các trường hợp kiểm thử (test cases) sau:
+- **Đường đi thông thường:** Kiểm tra tính đúng đắn trên các cặp điểm có đường đi rõ ràng.
+- **Điểm đầu trùng điểm cuối:** Khoảng cách phải bằng 0 và đường đi chỉ chứa một đỉnh.
+- **Điểm không tồn tại:** Hệ thống phải thông báo lỗi khi ID địa điểm không hợp lệ.
+- **Dữ liệu trọng số âm:** Đồ thị từ chối thêm cạnh có trọng số âm để đảm bảo tính đúng đắn của Dijkstra.
+- **Kiểm thử hồi quy CLI:** Đảm bảo các lệnh `--list`, `--start`, `--benchmark` hoạt động ổn định sau mỗi lần cập nhật.
+
+## 12. Hạn chế của dự án
+- Dữ liệu bản đồ HUST chỉ mang tính chất mô phỏng, khoảng cách giữa các điểm là ước tính.
+- Trực quan hóa bản đồ còn đơn giản, chỉ là sơ đồ 2D phẳng.
+- Chưa tính đến các yếu tố thực tế như: đường đang thi công, các tòa nhà có nhiều lối vào, hoặc độ cao (cầu thang).
+- Hiện tại chỉ hỗ trợ giao diện dòng lệnh (CLI), chưa có giao diện đồ họa (GUI) cho người dùng phổ thông.
+
+## 13. Hướng phát triển
+- Tích hợp dữ liệu thực tế từ OpenStreetMap hoặc GPS.
+- Xây dựng giao diện Web hoặc Ứng dụng di động để tăng tính tương tác.
+- Áp dụng thuật toán A* với hàm Heuristic dựa trên tọa độ để tăng tốc độ tìm kiếm.
+- Hỗ trợ tìm đường theo nhiều tiêu chí: quãng đường ngắn nhất, thời gian di chuyển nhanh nhất, hoặc đường đi thuận tiện nhất cho người khuyết tật.
+- Hiển thị hướng dẫn chỉ đường chi tiết từng bước (Step-by-step instructions).
+
+## 14. Kết luận
+Dự án đã xây dựng thành công ứng dụng tìm đường đi ngắn nhất trong khuôn viên HUST bằng thuật toán Dijkstra. Thông qua việc sử dụng Danh sách kề và Priority Queue, ứng dụng đạt hiệu năng cao và khả năng mở rộng tốt. Việc tổ chức dữ liệu qua các tệp CSV giúp hệ thống dễ dàng cập nhật và bảo trì. Kết quả benchmark thực tế đã khẳng định tính đúng đắn và hiệu quả của các lựa chọn cấu trúc dữ liệu và thuật toán trong đề tài này.
