@@ -1,43 +1,51 @@
 # HUST Campus Shortest Path
 
-Ứng dụng tìm đường đi ngắn nhất trong khuôn viên trường Đại học Bách khoa Hà Nội bằng thuật toán Dijkstra.
+A Python application for finding the shortest path between buildings and landmarks on the HUST campus using Dijkstra's algorithm.
 
-## Đặc điểm nổi bật
-- Hiện thực thuật toán Dijkstra bằng Python sử dụng `heapq`.
-- Thiết kế hướng đối tượng (OOP) với các lớp: Vertex, Edge, Graph, DijkstraResult, CampusNavigator.
-- Hỗ trợ tìm kiếm theo ID địa điểm hoặc tên tiếng Việt.
-- Dữ liệu bản đồ HUST mô phỏng dựa trên vị trí tương đối.
-- Tích hợp công cụ benchmark và trực quan hóa đường đi.
+## Features
+- Manual implementation of Dijkstra's algorithm using `heapq`.
+- Adjacency list graph representation.
+- Search by location ID (e.g., `NORTH_GATE`) or Name (e.g., `North Gate`).
+- Performance benchmarking and complexity analysis.
 
-## Hướng dẫn sử dụng
+## Project Structure
+- `src/`: Core logic (models, graph, dijkstra, data IO).
+- `data/`: CSV files containing nodes and edges for HUST.
+- `docs/`: Algorithm pseudocode, Big-O complexity, and performance reports.
+- `tests/`: Unit tests for the algorithm.
+- `main.py`: CLI entry point.
 
-### 1. Liệt kê tất cả địa điểm
+## Usage
+
+### 1. List all locations
 ```bash
 python main.py --list
 ```
 
-### 2. Tìm đường đi ngắn nhất (bằng ID hoặc Tên)
+### 2. Find shortest path by ID
 ```bash
 python main.py --start NORTH_GATE --end TQB_LIBRARY
 ```
 
-### 3. Tìm đường và trực quan hóa sơ đồ
+### 3. Find shortest path by Name
 ```bash
-python main.py --start NORTH_GATE --end STADIUM --visualize
+python main.py --start "North Gate" --end "Thư viện Tạ Quang Bửu"
 ```
 
-### 4. Chạy Benchmark hiệu năng
-Trên đồ thị HUST:
+### 4. Run performance benchmark
+On actual HUST map:
 ```bash
 python main.py --test
 ```
 
-Trên đồ thị ngẫu nhiên quy mô lớn:
+On generated random graphs:
 ```bash
-python main.py --benchmark --nodes 10000 --edges 40000 --seed 42 --runs 5
+python main.py --benchmark --nodes 1000 --edges 4000
 ```
 
-## Tài liệu chi tiết
-- [Báo cáo kỹ thuật (Tiếng Việt)](docs/technical_report_vn.md)
-- [Phân tích độ phức tạp](docs/complexity.md)
-- [Kết quả kiểm thử hiệu năng](docs/performance_test.md)
+## Documentation
+Detailed documentation is available in the `docs/` folder:
+- [Pseudocode](docs/pseudocode.md)
+- [Complexity Analysis](docs/complexity.md)
+- [Data Structures](docs/data_structure_explanation.md)
+- [Performance Test Results](docs/performance_test.md) 
