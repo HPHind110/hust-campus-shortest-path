@@ -13,8 +13,8 @@ Shortest distance:    104
 Path length:          5
 Visited node count:   923
 --------------------------
-Avg runtime:          2.5499 ms
-Median runtime:       2.5199 ms
-Min runtime:          2.4970 ms
-Max runtime:          2.6903 ms
+Avg runtime:          2.2088 ms
+Median runtime:       2.1865 ms
+Min runtime:          2.1080 ms
+Max runtime:          2.3961 ms
 --------------------------
