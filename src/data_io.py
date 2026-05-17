@@ -27,17 +27,24 @@ def load_data(nodes_file, edges_file):
     try:
         with open(edges_file, mode='r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
-            for row in reader:
-                graph.addEdge(
-                    source_id=row['from'],
-                    dest_id=row['to'],
-                    weight=float(row['weight']),
-                    bidirectional=int(row['bidirectional']) == 1
-                )
+            for line_num, row in enumerate(reader, start=2):
+                try:
+                    graph.addEdge(
+                        source_id=row['from'],
+                        dest_id=row['to'],
+                        weight=float(row['weight']),
+                        bidirectional=int(row['bidirectional']) == 1
+                    )
+                except ValueError as e:
+                    print(f"Error in {edges_file} (line {line_num}): {e}")
+                    return None
+                except KeyError as e:
+                    print(f"Error in {edges_file} (line {line_num}): missing column {e}.")
+                    return None
     except FileNotFoundError:
         print(f"Error: {edges_file} not found.")
         return None
-        
+
     return graph
 
 def save_data(output_file, result):

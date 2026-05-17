@@ -10,16 +10,6 @@ class Vertex:
     def __repr__(self):
         return f"Vertex({self.id}, {self.name})"
 
-class Edge:
-    def __init__(self, source, destination, weight, label=""):
-        self.source = source
-        self.destination = destination
-        self.weight = weight
-        self.label = label
-
-    def __repr__(self):
-        return f"Edge({self.source} -> {self.destination}, weight={self.weight})"
-
 class DijkstraResult:
     def __init__(self, source_id, dest_id, total_distance, path, visited_count, elapsed_ms):
         self.source_id = source_id

@@ -15,6 +15,12 @@ A Python application for finding the shortest path between buildings and landmar
 - `tests/`: Unit tests for the algorithm.
 - `main.py`: CLI entry point.
 
+## Installation
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Usage
 
 ### 1. List all locations

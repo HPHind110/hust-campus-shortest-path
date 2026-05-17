@@ -18,12 +18,17 @@ def visualize_path(graph, path=None, output_path="output/hust_shortest_path.png"
 
     plt.figure(figsize=(12, 10))
 
-    # 1. Draw all edges
+    # 1. Draw all edges (dedupe bidirectional pairs so each line is drawn once)
+    drawn = set()
     for start_id, neighbors in graph.adjacency_list.items():
         start_vertex = graph.vertices[start_id]
         for end_id, weight in neighbors:
+            key = frozenset((start_id, end_id))
+            if key in drawn:
+                continue
+            drawn.add(key)
             end_vertex = graph.vertices[end_id]
-            plt.plot([start_vertex.x, end_vertex.x], [start_vertex.y, end_vertex.y], 
+            plt.plot([start_vertex.x, end_vertex.x], [start_vertex.y, end_vertex.y],
                      color='gray', linestyle='-', linewidth=0.5, alpha=0.5, zorder=1)
 
     # 2. Draw the shortest path if provided

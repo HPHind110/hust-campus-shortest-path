@@ -18,41 +18,48 @@ class Graph:
 
     def addEdge(self, source_id, dest_id, weight, bidirectional=True):
         if weight < 0:
-            raise ValueError("Edge weight cannot be negative.")
-        
-        if source_id not in self.adjacency_list:
-            self.adjacency_list[source_id] = []
+            raise ValueError(
+                f"Edge weight cannot be negative (got {weight} for '{source_id}' -> '{dest_id}')."
+            )
+        if source_id not in self.vertices:
+            raise ValueError(f"Cannot add edge: source vertex '{source_id}' does not exist.")
+        if dest_id not in self.vertices:
+            raise ValueError(f"Cannot add edge: destination vertex '{dest_id}' does not exist.")
+
         self.adjacency_list[source_id].append((dest_id, weight))
-        self.edge_count += 1
-        
         if bidirectional:
-            if dest_id not in self.adjacency_list:
-                self.adjacency_list[dest_id] = []
             self.adjacency_list[dest_id].append((source_id, weight))
-            self.edge_count += 1
+        self.edge_count += 1
 
     def removeVertex(self, vertex_id):
-        """Optional: Removes a vertex and its associated edges."""
-        if vertex_id in self.vertices:
-            del self.vertices[vertex_id]
-            self.vertex_count -= 1
-            # Remove from adjacency list and all references in other lists
-            if vertex_id in self.adjacency_list:
-                # Decrease edge count for outgoing edges
-                self.edge_count -= len(self.adjacency_list[vertex_id])
-                del self.adjacency_list[vertex_id]
-            
-            for vid in self.adjacency_list:
-                original_len = len(self.adjacency_list[vid])
-                self.adjacency_list[vid] = [edge for edge in self.adjacency_list[vid] if edge[0] != vertex_id]
-                self.edge_count -= (original_len - len(self.adjacency_list[vid]))
+        """Removes a vertex and every logical edge touching it."""
+        if vertex_id not in self.vertices:
+            return
+
+        outgoing = {n for n, _ in self.adjacency_list.get(vertex_id, [])}
+        incoming = {
+            vid for vid, edges in self.adjacency_list.items()
+            if vid != vertex_id and any(e[0] == vertex_id for e in edges)
+        }
+        self.edge_count -= len(outgoing | incoming)
+
+        del self.vertices[vertex_id]
+        self.vertex_count -= 1
+        self.adjacency_list.pop(vertex_id, None)
+        for vid in self.adjacency_list:
+            self.adjacency_list[vid] = [e for e in self.adjacency_list[vid] if e[0] != vertex_id]
 
     def removeEdge(self, source_id, dest_id):
-        """Optional: Removes an edge."""
-        if source_id in self.adjacency_list:
-            original_len = len(self.adjacency_list[source_id])
-            self.adjacency_list[source_id] = [edge for edge in self.adjacency_list[source_id] if edge[0] != dest_id]
-            self.edge_count -= (original_len - len(self.adjacency_list[source_id]))
+        """Removes the logical edge between source_id and dest_id (clears both directions)."""
+        removed = False
+        for u, v in ((source_id, dest_id), (dest_id, source_id)):
+            if u in self.adjacency_list:
+                before = len(self.adjacency_list[u])
+                self.adjacency_list[u] = [e for e in self.adjacency_list[u] if e[0] != v]
+                if len(self.adjacency_list[u]) != before:
+                    removed = True
+        if removed:
+            self.edge_count -= 1
 
     def getNeighbors(self, vertex_id):
         return self.adjacency_list.get(vertex_id, [])
@@ -66,7 +73,7 @@ class Graph:
     def getEdgeCount(self):
         return self.edge_count
 
-    def get_vertex_by_name(self, name):
+    def getVertexByName(self, name):
         for vertex in self.vertices.values():
             if vertex.name.lower() == name.lower():
                 return vertex

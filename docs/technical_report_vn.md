@@ -89,16 +89,9 @@ Mỗi đỉnh có thể chứa các thông tin:
 - `x`, `y`: Tọa độ mô phỏng dùng cho trực quan hóa.
 - `description`: Mô tả ngắn về địa điểm.
 
-### 4.2. Edge
+### 4.2. Biểu diễn cạnh
 
-`Edge` biểu diễn một cạnh nối giữa hai đỉnh.
-
-Thông tin chính của một cạnh gồm:
-
-- `source`: Đỉnh nguồn.
-- `destination`: Đỉnh đích.
-- `weight`: Trọng số cạnh.
-- `label`: Nhãn hoặc mô tả cạnh nếu có.
+Cạnh không được biểu diễn bằng một lớp riêng. Trong danh sách kề của `Graph`, mỗi cạnh đi ra từ đỉnh `u` được lưu dưới dạng tuple `(neighbor_id, weight)`. Cách này gọn hơn và đủ thông tin cho thuật toán Dijkstra. Cờ `bidirectional` chỉ được dùng tại thời điểm nạp dữ liệu để quyết định có thêm cạnh chiều ngược lại hay không.
 
 ### 4.3. Graph
 

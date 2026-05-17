@@ -19,27 +19,31 @@ def generate_random_graph(num_nodes, extra_edges, max_weight, seed=42):
         graph.addVertex(vertex)
         
     # Ensure connectivity: create a path 0-1-2-...-(num_nodes-1)
+    existing_pairs = set()
     for i in range(num_nodes - 1):
         weight = rng.randint(1, max_weight)
-        graph.addEdge(str(i), str(i+1), weight)
-        
-    # Add extra random edges
+        u, v = str(i), str(i + 1)
+        graph.addEdge(u, v, weight)
+        existing_pairs.add(frozenset((u, v)))
+
+    # Add extra random edges (O(1) duplicate check via set)
     edges_count = num_nodes - 1
     attempts = 0
     max_attempts = extra_edges * 5
-    
+
     while edges_count < (num_nodes - 1 + extra_edges) and attempts < max_attempts:
         u = str(rng.randint(0, num_nodes - 1))
         v = str(rng.randint(0, num_nodes - 1))
-        
+
         if u != v:
-            neighbors = [neighbor for neighbor, _ in graph.getNeighbors(u)]
-            if v not in neighbors:
+            key = frozenset((u, v))
+            if key not in existing_pairs:
                 weight = rng.randint(1, max_weight)
                 graph.addEdge(u, v, weight)
+                existing_pairs.add(key)
                 edges_count += 1
         attempts += 1
-        
+
     return graph
 
 def run_performance_test(num_nodes, extra_edges, seed=42, runs=5, max_weight=100):
@@ -52,8 +56,7 @@ def run_performance_test(num_nodes, extra_edges, seed=42, runs=5, max_weight=100
     start_node = "0"
     end_node = str(num_nodes - 1)
     
-    # Count actual undirected edges
-    actual_edges = graph.getEdgeCount() // 2
+    actual_edges = graph.getEdgeCount()
     
     print(f"Running benchmark with {runs} runs from {start_node} to {end_node}...")
     
@@ -99,7 +102,7 @@ def run_benchmark(graph):
         print("Not enough nodes to benchmark.")
         return
 
-    print(f"Benchmarking on current graph ({graph.getVertexCount()} nodes, {graph.getEdgeCount() // 2} edges)")
+    print(f"Benchmarking on current graph ({graph.getVertexCount()} nodes, {graph.getEdgeCount()} edges)")
     
     total_time = 0
     iterations = 10
@@ -108,7 +111,9 @@ def run_benchmark(graph):
     for _ in range(iterations):
         start = rng.choice(all_node_ids)
         end = rng.choice(all_node_ids)
-        
+        while end == start:
+            end = rng.choice(all_node_ids)
+
         result = dijkstra(graph, start, end)
         total_time += result.elapsed_ms
         

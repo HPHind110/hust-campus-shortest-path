@@ -19,8 +19,8 @@ class CampusNavigator:
             return None
         
         # Resolve IDs if names were provided
-        start_vertex = self.graph.getVertex(start_id_or_name) or self.graph.get_vertex_by_name(start_id_or_name)
-        end_vertex = self.graph.getVertex(end_id_or_name) or self.graph.get_vertex_by_name(end_id_or_name)
+        start_vertex = self.graph.getVertex(start_id_or_name) or self.graph.getVertexByName(start_id_or_name)
+        end_vertex = self.graph.getVertex(end_id_or_name) or self.graph.getVertexByName(end_id_or_name)
 
         if not start_vertex or not end_vertex:
             return None
@@ -55,22 +55,18 @@ class CampusNavigator:
             vertices_in_cat = grouped[cat_key]
             if not vertices_in_cat:
                 continue
-                
+
             print(f"\n[{categories[cat_key]}]")
-            
-            # Find max length of ID for alignment
-            max_id_len = 0
+
+            max_id_len = max(
+                (len(v.id) for v in vertices_in_cat if v.id != v.name), default=0
+            )
+
             for vertex in vertices_in_cat:
-                display_name = "Ta Quang Buu Library" if vertex.id == "TQB_LIBRARY" else vertex.name
-                if vertex.id != display_name:
-                    max_id_len = max(max_id_len, len(vertex.id))
-            
-            for vertex in vertices_in_cat:
-                display_name = "Ta Quang Buu Library" if vertex.id == "TQB_LIBRARY" else vertex.name
-                if vertex.id == display_name:
+                if vertex.id == vertex.name:
                     print(f"  - {vertex.id}")
                 else:
-                    print(f"  - {vertex.id:<{max_id_len}} : {display_name}")
+                    print(f"  - {vertex.id:<{max_id_len}} : {vertex.name}")
 
     def performanceTest(self, num_nodes, extra_edges, seed=42, runs=5):
         run_performance_test(num_nodes, extra_edges, seed, runs)
