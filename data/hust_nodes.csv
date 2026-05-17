@@ -1,36 +1,37 @@
 id,name,type,x,y,description
-NORTH_GATE,Cổng Bắc,gate,345,40,Cổng Bắc trên đường Đại Cồ Việt
-WEST_GATE,Cổng Parabol,gate,90,345,Cổng Parabol phía đường Giải Phóng
-B8_GATE,Cổng B8,gate,625,345,Cổng B8 phía đường Trần Đại Nghĩa
-C1,C1,building,340,95,Nhà C1
-C2,C2,building,245,200,Nhà C2
-C3,C3,building,455,165,Nhà C3
-C4,C4,building,455,205,Nhà C4
-C5,C5,building,455,255,Nhà C5
-C6,C6,building,540,185,Nhà C6
-C7,C7,building,540,250,Nhà C7
-C8,C8,building,555,315,Nhà C8
-C9,C9,building,245,260,Nhà C9
-C10,C10,building,430,320,Nhà C10
-HT,HT,building,482,105,Hội trường
-ITIMS,ITIMS,building,405,300,Viện ITIMS
-TQB_LIBRARY,Thư viện Tạ Quang Bửu,library,465,430,Thư viện Tạ Quang Bửu
-TIEN_LAKE,Hồ Tiền,lake,380,490,Hồ Tiền
-D1,D1,building,435,395,Nhà D1
-D2,D2,building,205,425,Nhà D2
-D3,D3,building,565,400,Nhà D3
-D4,D4,building,210,485,Nhà D4
-D5,D5,building,565,440,Nhà D5
-D6,D6,building,320,455,Nhà D6
-D7_ITP,D7-ITP,building,555,485,Nhà D7-ITP
-D8,D8,building,320,505,Nhà D8
-D9,D9,building,450,515,Nhà D9
-B1,B1,building,805,445,Nhà B1
-B5,B5,building,845,185,Nhà B5
-B5B,B5b,building,845,128,Nhà B5b
-B6,B6,building,755,185,Nhà B6
-B7,B7,building,755,255,Nhà B7
-B7BIS,B7bis,building,755,320,Nhà B7bis
-B8,B8,building,755,370,Nhà B8
-B9,B9,building,845,255,Nhà B9
-F,F,building,842,475,Nhà F
+NORTH_GATE,Cổng Bắc,gate,335,35,Cổng Bắc trên đường Đại Cồ Việt
+WEST_GATE,Cổng Parabol,gate,112,351,Cổng Parabol phía đường Giải Phóng
+B8_GATE,Cổng B8,gate,683,352,Cổng B8 phía đường Trần Đại Nghĩa
+C1,C1,building,337,110,Nhà C1
+C2,C2,building,262,185,Nhà C2
+C3,C3,building,500,160,Nhà C3
+C4,C4,building,500,213,Nhà C4
+C5,C5,building,500,267,Nhà C5
+C6,C6,building,550,200,Nhà C6
+C7,C7,building,550,250,Nhà C7
+C8,C8,building,550,305,Nhà C8
+C9,C9,building,245,270,Nhà C9
+C10,C10,building,475,305,Nhà C10
+CFC,CFC,building,545,150,Nhà CFC
+HT,HT,building,475,88,Hội trường
+ITIMS,ITIMS,building,393,315,Viện ITIMS
+TQB_LIBRARY,Thư viện Tạ Quang Bửu,library,470,395,Thư viện Tạ Quang Bửu
+TIEN_LAKE,Hồ Tiền,lake,415,490,Hồ Tiền
+D1,D1,building,378,365,Nhà D1
+D2,D2,building,220,422,Nhà D2
+D3,D3,building,584,363,Nhà D3
+D4,D4,building,220,470,Nhà D4
+D5,D5,building,584,420,Nhà D5
+D6,D6,building,325,468,Nhà D6
+D7_ITP,D7-ITP,building,570,470,Nhà D7-ITP
+D8,D8,building,325,502,Nhà D8
+D9,D9,building,470,505,Nhà D9
+B1,B1,building,800,405,Nhà B1
+B5,B5,building,800,162,Nhà B5
+B6,B6,building,755,163,Nhà B6
+B7,B7,building,755,217,Nhà B7
+B7BIS,B7bis,building,765,265,Nhà B7bis
+B8,B8,building,755,317,Nhà B8
+B9,B9,building,800,215,Nhà B9
+PC,PC,building,300,365,PC
+VDZ,VDZ,building,340,365,VDZ

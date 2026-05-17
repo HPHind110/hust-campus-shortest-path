@@ -1,0 +1,8 @@
+Shortest Path Result
+====================
+Source: NORTH_GATE
+Destination: B1
+Distance: 360.0
+Path: NORTH_GATE -> HT -> CFC -> C6 -> C7 -> C8 -> D3 -> B8_GATE -> B1
+Visited Nodes: 32
+Time: 0.0334 ms
