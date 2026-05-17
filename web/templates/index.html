@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>HUST Campus Shortest Path</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; }
+    #app { display: flex; height: 100%; }
+    #sidebar {
+      width: 320px; padding: 16px; box-sizing: border-box;
+      background: #f7f7f8; border-right: 1px solid #ddd; overflow-y: auto;
+    }
+    #map { flex: 1; background: #fff; }
+    h1 { font-size: 18px; margin: 0 0 12px; }
+    .panel { background: white; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px; margin-bottom: 12px; }
+    .panel h2 { font-size: 13px; margin: 0 0 6px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+    .endpoint { font-size: 14px; padding: 4px 0; }
+    .endpoint .label { color: #888; display: inline-block; width: 50px; }
+    .endpoint .value { font-weight: 600; }
+    .endpoint .empty { color: #bbb; font-style: italic; font-weight: normal; }
+    button {
+      width: 100%; padding: 8px 12px; border: none; border-radius: 4px;
+      background: #2563eb; color: white; font-weight: 600; cursor: pointer; margin-top: 4px;
+    }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    button.secondary { background: #6b7280; }
+    button.secondary:hover { background: #4b5563; }
+    .result-row { font-size: 14px; padding: 3px 0; display: flex; justify-content: space-between; }
+    .result-row .v { font-weight: 600; }
+    .help { font-size: 12px; color: #666; line-height: 1.5; }
+    .leaflet-tooltip.node-label { background: rgba(255,255,255,0.85); border: 1px solid #888; font-size: 11px; padding: 1px 5px; }
+    .error { color: #b91c1c; font-size: 13px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <h1>HUST Campus Shortest Path</h1>
+
+      <div class="panel">
+        <h2>Hướng dẫn</h2>
+        <div class="help">
+          Click vào một marker xanh để chọn <b>điểm bắt đầu</b>, click marker tiếp theo để chọn <b>điểm đến</b>.
+          Đường đi ngắn nhất sẽ được vẽ màu đỏ.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Đã chọn</h2>
+        <div class="endpoint">
+          <span class="label">Start:</span>
+          <span id="start-name" class="empty">chưa chọn</span>
+        </div>
+        <div class="endpoint">
+          <span class="label">End:</span>
+          <span id="end-name" class="empty">chưa chọn</span>
+        </div>
+        <button id="reset-btn" class="secondary">Reset</button>
+      </div>
+
+      <div class="panel" id="result-panel" style="display:none;">
+        <h2>Kết quả</h2>
+        <div class="result-row"><span>Tổng khoảng cách:</span><span class="v" id="r-distance">—</span></div>
+        <div class="result-row"><span>Số node trên đường:</span><span class="v" id="r-pathlen">—</span></div>
+        <div class="result-row"><span>Số node duyệt:</span><span class="v" id="r-visited">—</span></div>
+        <div class="result-row"><span>Thời gian:</span><span class="v" id="r-time">—</span></div>
+        <div style="margin-top:8px; font-size: 12px; color: #555;" id="r-path"></div>
+      </div>
+
+      <div id="error-box" class="error" style="display:none;"></div>
+    </aside>
+
+    <div id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const MAP_WIDTH = 904;
+    const MAP_HEIGHT = 556;
+
+    const map = L.map('map', {
+      crs: L.CRS.Simple,
+      minZoom: -2,
+      maxZoom: 2,
+      zoomSnap: 0.25,
+    });
+
+    const bounds = [[0, 0], [MAP_HEIGHT, MAP_WIDTH]];
+    L.imageOverlay('/map-image', bounds).addTo(map);
+    map.fitBounds(bounds);
+
+    function toLatLng(x, y) {
+      return [MAP_HEIGHT - y, x];
+    }
+
+    const typeColors = {
+      gate: '#16a34a',
+      library: '#7c3aed',
+      lake: '#0891b2',
+      building: '#2563eb',
+      canteen: '#ea580c',
+      dormitory: '#db2777',
+      sport: '#ca8a04',
+    };
+
+    let nodesById = {};
+    let markersById = {};
+    let startId = null;
+    let endId = null;
+    let pathLayer = null;
+
+    function renderEndpoints() {
+      const startEl = document.getElementById('start-name');
+      const endEl = document.getElementById('end-name');
+
+      if (startId) {
+        startEl.textContent = nodesById[startId].name;
+        startEl.className = 'value';
+      } else {
+        startEl.textContent = 'chưa chọn';
+        startEl.className = 'empty';
+      }
+      if (endId) {
+        endEl.textContent = nodesById[endId].name;
+        endEl.className = 'value';
+      } else {
+        endEl.textContent = 'chưa chọn';
+        endEl.className = 'empty';
+      }
+
+      Object.entries(markersById).forEach(([id, m]) => {
+        const isStart = id === startId;
+        const isEnd = id === endId;
+        const baseColor = typeColors[nodesById[id].type] || '#2563eb';
+        const color = isStart ? '#16a34a' : isEnd ? '#dc2626' : baseColor;
+        const radius = (isStart || isEnd) ? 9 : 5;
+        m.setStyle({ fillColor: color, color: '#000', radius, weight: isStart || isEnd ? 2 : 1 });
+      });
+    }
+
+    function clearResult() {
+      document.getElementById('result-panel').style.display = 'none';
+      document.getElementById('error-box').style.display = 'none';
+      if (pathLayer) {
+        map.removeLayer(pathLayer);
+        pathLayer = null;
+      }
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('error-box');
+      box.textContent = msg;
+      box.style.display = 'block';
+    }
+
+    async function fetchPath() {
+      clearResult();
+      try {
+        const res = await fetch(`/api/path?start=${encodeURIComponent(startId)}&end=${encodeURIComponent(endId)}`);
+        const data = await res.json();
+        if (!res.ok) {
+          showError(data.error || 'Lỗi không xác định');
+          return;
+        }
+
+        const latlngs = data.path.map(id => {
+          const n = nodesById[id];
+          return toLatLng(n.x, n.y);
+        });
+        pathLayer = L.polyline(latlngs, { color: '#dc2626', weight: 5, opacity: 0.85 }).addTo(map);
+
+        document.getElementById('r-distance').textContent = `${data.total_distance} m`;
+        document.getElementById('r-pathlen').textContent = data.path.length;
+        document.getElementById('r-visited').textContent = data.visited_count;
+        document.getElementById('r-time').textContent = `${data.elapsed_ms.toFixed(3)} ms`;
+        document.getElementById('r-path').textContent = data.path.map(id => nodesById[id].name).join(' → ');
+        document.getElementById('result-panel').style.display = 'block';
+      } catch (e) {
+        showError('Không thể kết nối tới server.');
+      }
+    }
+
+    function onMarkerClick(id) {
+      if (startId === id) {
+        startId = null;
+      } else if (endId === id) {
+        endId = null;
+      } else if (!startId) {
+        startId = id;
+      } else if (!endId) {
+        endId = id;
+      } else {
+        startId = id;
+        endId = null;
+      }
+
+      renderEndpoints();
+      if (startId && endId) {
+        fetchPath();
+      } else {
+        clearResult();
+      }
+    }
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      startId = null;
+      endId = null;
+      renderEndpoints();
+      clearResult();
+    });
+
+    fetch('/api/nodes')
+      .then(r => r.json())
+      .then(data => {
+        data.nodes.forEach(n => {
+          nodesById[n.id] = n;
+          const color = typeColors[n.type] || '#2563eb';
+          const marker = L.circleMarker(toLatLng(n.x, n.y), {
+            radius: 5,
+            fillColor: color,
+            color: '#000',
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.9,
+          }).addTo(map);
+          marker.bindTooltip(n.name, { className: 'node-label', direction: 'top', offset: [0, -5] });
+          marker.on('click', () => onMarkerClick(n.id));
+          markersById[n.id] = marker;
+        });
+        renderEndpoints();
+      });
+  </script>
+</body>
+</html>
