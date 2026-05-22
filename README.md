@@ -104,10 +104,10 @@ Có thể tùy chỉnh thêm `--seed`, `--runs` để kiểm soát tính lặp l
 
 ## Dữ liệu bản đồ
 
-- `data/hust_nodes.csv`: mỗi dòng mô tả một địa điểm với các cột `id, name, type, x, y, description`. Tọa độ `x, y` là vị trí pixel trên ảnh `map-dhbk.jpg` (904×556 px), trục y tăng từ trên xuống dưới.
-- `data/hust_edges.csv`: mỗi dòng mô tả một lối đi với các cột `from, to, weight, bidirectional`. `weight` là khoảng cách ước lượng theo mét; `bidirectional=1` nghĩa là đi được hai chiều.
+- `data/hust_nodes.csv`: mỗi dòng mô tả một địa điểm với các cột `id, name, type, x, y, description, visible`. Tọa độ `x, y` là vị trí pixel trên ảnh `map-dhbk.jpg` (904×556 px), trục y tăng từ trên xuống dưới. `visible=0` để tạo *đỉnh phụ ẩn* (ví dụ ngã ba, ngã tư) — đỉnh này tham gia vào Dijkstra nhưng không hiện marker trên UI.
+- `data/hust_edges.csv`: mỗi dòng mô tả một lối đi với các cột `from, to, weight, bidirectional, waypoints`. `weight` là khoảng cách ước lượng theo mét; `bidirectional=1` nghĩa là đi được hai chiều. `waypoints` (tuỳ chọn) là chuỗi điểm trung gian theo định dạng `"x1,y1;x2,y2;..."` để bẻ cong đường vẽ trên bản đồ theo lối đi thật (cần đặt trong dấu nháy kép vì có dấu phẩy).
 
-Có thể chỉnh sửa hai file CSV để bổ sung địa điểm mới hoặc điều chỉnh sơ đồ kết nối — chương trình sẽ tự động dùng dữ liệu mới ở lần chạy kế tiếp.
+Hai cơ chế `visible=0` và `waypoints` có thể dùng kết hợp: dùng đỉnh phụ ẩn cho các ngã rẽ thật sự (nhiều con đường dùng chung), dùng `waypoints` cho các đoạn cong không có nhánh rẽ. Có thể chỉnh sửa hai file CSV để bổ sung địa điểm mới hoặc điều chỉnh sơ đồ kết nối — chương trình sẽ tự động dùng dữ liệu mới ở lần chạy kế tiếp.
 
 ## Tài liệu
 

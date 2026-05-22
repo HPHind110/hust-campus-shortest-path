@@ -1,39 +1,141 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <title>HUST Campus Shortest Path</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; }
-    #app { display: flex; height: 100%; }
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, sans-serif;
+    }
+
+    #app {
+      display: flex;
+      height: 100%;
+    }
+
     #sidebar {
-      width: 320px; padding: 16px; box-sizing: border-box;
-      background: #f7f7f8; border-right: 1px solid #ddd; overflow-y: auto;
+      width: 320px;
+      padding: 16px;
+      box-sizing: border-box;
+      background: #f7f7f8;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
     }
-    #map { flex: 1; background: #fff; }
-    h1 { font-size: 18px; margin: 0 0 12px; }
-    .panel { background: white; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px; margin-bottom: 12px; }
-    .panel h2 { font-size: 13px; margin: 0 0 6px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-    .endpoint { font-size: 14px; padding: 4px 0; }
-    .endpoint .label { color: #888; display: inline-block; width: 50px; }
-    .endpoint .value { font-weight: 600; }
-    .endpoint .empty { color: #bbb; font-style: italic; font-weight: normal; }
+
+    #map {
+      flex: 1;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+
+    .panel h2 {
+      font-size: 13px;
+      margin: 0 0 6px;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .endpoint {
+      font-size: 14px;
+      padding: 4px 0;
+    }
+
+    .endpoint .label {
+      color: #888;
+      display: inline-block;
+      width: 50px;
+    }
+
+    .endpoint .value {
+      font-weight: 600;
+    }
+
+    .endpoint .empty {
+      color: #bbb;
+      font-style: italic;
+      font-weight: normal;
+    }
+
     button {
-      width: 100%; padding: 8px 12px; border: none; border-radius: 4px;
-      background: #2563eb; color: white; font-weight: 600; cursor: pointer; margin-top: 4px;
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      background: #2563eb;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
     }
-    button:hover { background: #1d4ed8; }
-    button:disabled { background: #ccc; cursor: not-allowed; }
-    button.secondary { background: #6b7280; }
-    button.secondary:hover { background: #4b5563; }
-    .result-row { font-size: 14px; padding: 3px 0; display: flex; justify-content: space-between; }
-    .result-row .v { font-weight: 600; }
-    .help { font-size: 12px; color: #666; line-height: 1.5; }
-    .leaflet-tooltip.node-label { background: rgba(255,255,255,0.85); border: 1px solid #888; font-size: 11px; padding: 1px 5px; }
-    .error { color: #b91c1c; font-size: 13px; margin-top: 6px; }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: #6b7280;
+    }
+
+    button.secondary:hover {
+      background: #4b5563;
+    }
+
+    .result-row {
+      font-size: 14px;
+      padding: 3px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .result-row .v {
+      font-weight: 600;
+    }
+
+    .help {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .leaflet-tooltip.node-label {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid #888;
+      font-size: 11px;
+      padding: 1px 5px;
+    }
+
+    .error {
+      color: #b91c1c;
+      font-size: 13px;
+      margin-top: 6px;
+    }
   </style>
 </head>
+
 <body>
   <div id="app">
     <aside id="sidebar">
@@ -63,9 +165,10 @@
       <div class="panel" id="result-panel" style="display:none;">
         <h2>Kết quả</h2>
         <div class="result-row"><span>Tổng khoảng cách:</span><span class="v" id="r-distance">—</span></div>
+        <div class="result-row"><span>Thời gian đi (ước tính):</span><span class="v" id="r-walktime">—</span></div>
         <div class="result-row"><span>Số node trên đường:</span><span class="v" id="r-pathlen">—</span></div>
         <div class="result-row"><span>Số node duyệt:</span><span class="v" id="r-visited">—</span></div>
-        <div class="result-row"><span>Thời gian:</span><span class="v" id="r-time">—</span></div>
+        <div class="result-row"><span>Thời gian thuật toán:</span><span class="v" id="r-time">—</span></div>
         <div style="margin-top:8px; font-size: 12px; color: #555;" id="r-path"></div>
       </div>
 
@@ -165,17 +268,23 @@
           return;
         }
 
-        const latlngs = data.path.map(id => {
-          const n = nodesById[id];
-          return toLatLng(n.x, n.y);
-        });
+        const polylineSource = data.polyline && data.polyline.length
+          ? data.polyline
+          : data.path.map(id => [nodesById[id].x, nodesById[id].y]);
+        const latlngs = polylineSource.map(([x, y]) => toLatLng(x, y));
         pathLayer = L.polyline(latlngs, { color: '#dc2626', weight: 5, opacity: 0.85 }).addTo(map);
 
+        const visiblePath = data.path.filter(id => nodesById[id].visible !== false);
+        const walkSec = Math.round(data.total_distance);
+        const walkStr = walkSec < 60
+          ? `${walkSec * 1.5} giây`
+          : `${Math.floor(walkSec * 1.5 / 60)} phút ${walkSec * 1.5 % 60} giây`;
         document.getElementById('r-distance').textContent = `${data.total_distance} m`;
-        document.getElementById('r-pathlen').textContent = data.path.length;
+        document.getElementById('r-walktime').textContent = walkStr;
+        document.getElementById('r-pathlen').textContent = visiblePath.length;
         document.getElementById('r-visited').textContent = data.visited_count;
         document.getElementById('r-time').textContent = `${data.elapsed_ms.toFixed(3)} ms`;
-        document.getElementById('r-path').textContent = data.path.map(id => nodesById[id].name).join(' → ');
+        document.getElementById('r-path').textContent = visiblePath.map(id => nodesById[id].name).join(' → ');
         document.getElementById('result-panel').style.display = 'block';
       } catch (e) {
         showError('Không thể kết nối tới server.');
@@ -216,6 +325,7 @@
       .then(data => {
         data.nodes.forEach(n => {
           nodesById[n.id] = n;
+          if (n.visible === false) return;
           const color = typeColors[n.type] || '#2563eb';
           const marker = L.circleMarker(toLatLng(n.x, n.y), {
             radius: 5,
@@ -233,4 +343,5 @@
       });
   </script>
 </body>
+
 </html>
