@@ -1,11 +1,12 @@
 class Vertex:
-    def __init__(self, vertex_id, name, vertex_type, x=0, y=0, description=""):
+    def __init__(self, vertex_id, name, vertex_type, x=0, y=0, description="", visible=True):
         self.id = vertex_id
         self.name = name
         self.type = vertex_type
         self.x = x
         self.y = y
         self.description = description
+        self.visible = visible
 
     def __repr__(self):
         return f"Vertex({self.id}, {self.name})"

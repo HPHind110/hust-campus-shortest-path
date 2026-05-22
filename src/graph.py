@@ -6,6 +6,9 @@ class Graph:
         self.adjacency_list = {}
         # Vertex metadata: vertex_id -> Vertex object
         self.vertices = {}
+        # Optional polyline geometry for an edge: (source_id, dest_id) -> [(x, y), ...]
+        # Only used for rendering — Dijkstra ignores it.
+        self.edge_waypoints = {}
         self.vertex_count = 0
         self.edge_count = 0
 
@@ -16,7 +19,7 @@ class Graph:
             if vertex.id not in self.adjacency_list:
                 self.adjacency_list[vertex.id] = []
 
-    def addEdge(self, source_id, dest_id, weight, bidirectional=True):
+    def addEdge(self, source_id, dest_id, weight, bidirectional=True, waypoints=None):
         if weight < 0:
             raise ValueError(
                 f"Edge weight cannot be negative (got {weight} for '{source_id}' -> '{dest_id}')."
@@ -29,7 +32,14 @@ class Graph:
         self.adjacency_list[source_id].append((dest_id, weight))
         if bidirectional:
             self.adjacency_list[dest_id].append((source_id, weight))
+        if waypoints:
+            self.edge_waypoints[(source_id, dest_id)] = list(waypoints)
+            if bidirectional:
+                self.edge_waypoints[(dest_id, source_id)] = list(reversed(waypoints))
         self.edge_count += 1
+
+    def getEdgeWaypoints(self, source_id, dest_id):
+        return self.edge_waypoints.get((source_id, dest_id), [])
 
     def removeVertex(self, vertex_id):
         """Removes a vertex and every logical edge touching it."""
