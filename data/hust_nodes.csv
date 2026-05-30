@@ -1,4 +1,4 @@
-id,name,type,x,y,description,visible
+﻿id,name,type,x,y,description,visible
 NORTH_GATE,Cổng Bắc,gate,335,35,Cổng Bắc trên đường Đại Cồ Việt,1
 WEST_GATE,Cổng Parabol,gate,112,351,Cổng Parabol phía đường Giải Phóng,1
 B8_GATE,Cổng B8,gate,683,352,Cổng B8 phía đường Trần Đại Nghĩa,1

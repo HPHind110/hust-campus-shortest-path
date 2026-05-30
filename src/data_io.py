@@ -25,7 +25,7 @@ def load_data(nodes_file, edges_file):
 
     # Load nodes
     try:
-        with open(nodes_file, mode='r', encoding='utf-8') as f:
+        with open(nodes_file, mode='r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 visible_raw = row.get('visible', '1')
@@ -46,7 +46,7 @@ def load_data(nodes_file, edges_file):
 
     # Load edges
     try:
-        with open(edges_file, mode='r', encoding='utf-8') as f:
+        with open(edges_file, mode='r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
             for line_num, row in enumerate(reader, start=2):
                 try:

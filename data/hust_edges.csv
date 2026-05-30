@@ -1,4 +1,4 @@
-from,to,weight,bidirectional,waypoints
+﻿from,to,weight,bidirectional,waypoints
 NORTH_GATE,C1,20,1,
 NORTH_GATE,HT,50,1,
 WEST_GATE,C9,80,1,
